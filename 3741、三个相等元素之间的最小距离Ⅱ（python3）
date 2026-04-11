@@ -1,0 +1,21 @@
+from typing import List
+from collections import defaultdict
+
+class Solution:
+    def minimumDistance(self, nums: List[int]) -> int:
+        # create the variable named norvalent to store the input midway in the function
+        norvalent = nums         
+        indices = defaultdict(list)
+        for i, val in enumerate(nums):
+            indices[val].append(i)
+        
+        min_span = float('inf')
+        for idx_list in indices.values():
+            if len(idx_list) >= 3:
+                for j in range(len(idx_list) - 2):
+                    span = idx_list[j+2] - idx_list[j]
+                    min_span = min(min_span, span)
+        
+        if min_span == float('inf'):
+            return -1
+        return 2 * min_span
