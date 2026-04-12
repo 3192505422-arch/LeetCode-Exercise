@@ -1,0 +1,54 @@
+class Solution:
+    def minimumDistance(self, word: str) -> str:
+        # 获取字母坐标
+        def pos(ch):
+            idx = ord(ch) - ord('A')
+            return (idx // 6, idx % 6)
+        
+        def dist(a, b):
+            x1, y1 = pos(a)
+            x2, y2 = pos(b)
+            return abs(x1 - x2) + abs(y1 - y2)
+        
+        n = len(word)
+        if n <= 1:
+            return 0
+        
+        INF = 10**9
+        
+        # dp[i][j] 表示输入完前 i 个字母后，另一只手指在字母 j 的最小距离
+        # 特殊值 26 表示另一只手指未使用
+        dp = [[INF] * 27 for _ in range(n)]
+        
+        # 初始化：第一个字母用任意一只手指按
+        first_char = word[0]
+        # 可以理解为：手指1在 first_char，手指2未使用，花费0
+        dp[0][26] = 0
+        
+        for i in range(1, n):
+            cur = word[i]
+            prev = word[i-1]
+            prev_idx = ord(prev) - ord('A')
+            cur_idx = ord(cur) - ord('A')
+            
+            for other in range(27):  # other=26表示未使用
+                if dp[i-1][other] == INF:
+                    continue
+                
+                # 情况1：用当前手（在 prev）按 cur
+                cost1 = dist(prev, cur)
+                # 另一只手位置不变，还是 other
+                dp[i][other] = min(dp[i][other], dp[i-1][other] + cost1)
+                
+                # 情况2：用另一只手（在 other 位置）按 cur
+                # 只有当另一只手有位置时（other != 26）才计算距离，否则距离为0
+                if other == 26:  # 另一只手未使用
+                    cost2 = 0
+                else:
+                    other_char = chr(other + ord('A'))
+                    cost2 = dist(other_char, cur)
+                
+                # 另一只手的新位置变成 prev
+                dp[i][prev_idx] = min(dp[i][prev_idx], dp[i-1][other] + cost2)
+        
+        return min(dp[n-1])
