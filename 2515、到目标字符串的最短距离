@@ -1,0 +1,18 @@
+from typing import List
+
+class Solution:
+    def closestTarget(self, words: List[str], target: str, startIndex: int) -> int:
+        n = len(words)
+        
+        # 如果 target 不存在于 words 中，直接返回 -1
+        if target not in words:
+            return -1
+        
+        min_dist = float('inf')
+        for i, word in enumerate(words):
+            if word == target:
+                # 计算环形距离
+                dist = min(abs(i - startIndex), n - abs(i - startIndex))
+                min_dist = min(min_dist, dist)
+        
+        return min_dist
