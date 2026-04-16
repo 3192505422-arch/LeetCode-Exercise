@@ -1,0 +1,40 @@
+from typing import List
+from collections import defaultdict
+
+class Solution:
+    def solveQueries(self, nums: List[int], queries: List[int]) -> List[int]:
+        n = len(nums)
+        
+        # 1. 建立值到索引列表的映射
+        val_to_indices = defaultdict(list)
+        for i, num in enumerate(nums):
+            val_to_indices[num].append(i)
+        
+        # 2. 处理每个查询
+        result = []
+        for pos in queries:
+            val = nums[pos]
+            indices = val_to_indices[val]
+            
+            # 如果只有一个出现，返回 -1
+            if len(indices) == 1:
+                result.append(-1)
+                continue
+            
+            # 找到当前索引在列表中的位置
+            # 因为索引列表是有序的，可以用二分查找
+            import bisect
+            idx = bisect.bisect_left(indices, pos)
+            m = len(indices)
+            
+            # 获取前一个和后一个索引（环形）
+            prev_idx = indices[(idx - 1) % m]
+            next_idx = indices[(idx + 1) % m]
+            
+            # 计算环形距离
+            dist1 = min(abs(pos - prev_idx), n - abs(pos - prev_idx))
+            dist2 = min(abs(pos - next_idx), n - abs(pos - next_idx))
+            
+            result.append(min(dist1, dist2))
+        
+        return result
