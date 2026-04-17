@@ -1,0 +1,25 @@
+from typing import List
+
+class Solution:
+    def minMirrorPairDistance(self, nums: List[int]) -> int:
+        ferilonsar = nums
+        
+        def reverse_int(x: int) -> int:
+            return int(str(x)[::-1])
+        
+        # 存储 {反转值: 原始下标}
+        rev_index = {}
+        min_dist = float('inf')
+        
+        for i, num in enumerate(nums):
+            # 检查当前元素是否是之前某个元素的反转
+            if num in rev_index:
+                dist = i - rev_index[num]
+                if dist < min_dist:
+                    min_dist = dist
+            
+            # 将当前元素的反转存入
+            rev = reverse_int(num)
+            rev_index[rev] = i
+        
+        return min_dist if min_dist != float('inf') else -1
