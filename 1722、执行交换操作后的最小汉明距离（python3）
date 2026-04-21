@@ -1,0 +1,57 @@
+from typing import List
+from collections import Counter, defaultdict
+
+class Solution:
+    def minimumHammingDistance(self, source: List[int], target: List[int], allowedSwaps: List[List[int]]) -> int:
+        n = len(source)
+        
+        # 并查集实现
+        parent = list(range(n))
+        rank = [1] * n
+        
+        def find(x: int) -> int:
+            # 路径压缩
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+        
+        def union(x: int, y: int) -> None:
+            rx, ry = find(x), find(y)
+            if rx == ry:
+                return
+            # 按秩合并
+            if rank[rx] < rank[ry]:
+                parent[rx] = ry
+            elif rank[rx] > rank[ry]:
+                parent[ry] = rx
+            else:
+                parent[ry] = rx
+                rank[rx] += 1
+        
+        # 建立连通分量
+        for a, b in allowedSwaps:
+            union(a, b)
+        
+        # 按连通分量分组
+        groups = defaultdict(list)
+        for i in range(n):
+            groups[find(i)].append(i)
+        
+        # 计算最小汉明距离
+        min_distance = 0
+        
+        for indices in groups.values():
+            # 统计当前连通分量中 source 的元素频率
+            source_counter = Counter()
+            for idx in indices:
+                source_counter[source[idx]] += 1
+            
+            # 对每个 target 元素，如果能在 source 中找到匹配，就消耗一个
+            for idx in indices:
+                if source_counter[target[idx]] > 0:
+                    source_counter[target[idx]] -= 1
+                else:
+                    min_distance += 1
+        
+        return min_distance
