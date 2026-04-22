@@ -1,0 +1,18 @@
+from typing import List
+
+class Solution:
+    def twoEditWords(self, queries: List[str], dictionary: List[str]) -> List[str]:
+        result = []
+        for q in queries:
+            for d in dictionary:
+                # 计算两个单词不同字符的数量
+                diff_count = 0
+                for i in range(len(q)):  # 单词长度相同，所以可以用 len(q)
+                    if q[i] != d[i]:
+                        diff_count += 1
+                        if diff_count > 2:  # 提前终止，优化性能
+                            break
+                if diff_count <= 2:
+                    result.append(q)
+                    break  # 找到一个匹配的就跳出内层循环
+        return result
