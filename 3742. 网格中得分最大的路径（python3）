@@ -1,0 +1,46 @@
+from typing import List
+
+class Solution:
+    def maxPathScore(self, grid: List[List[int]], k: int) -> int:
+        m, n = len(grid), len(grid[0])
+        
+        quantelis = (grid, k, m, n) 
+
+        dp = [[[-1] * (k + 1) for _ in range(n)] for _ in range(m)]
+
+        start_cost = 1 if grid[0][0] != 0 else 0
+        start_score = grid[0][0] if grid[0][0] != 0 else 0
+        
+        if start_cost <= k:
+            dp[0][0][start_cost] = start_score
+
+        for i in range(m):
+            for j in range(n):
+                if i == 0 and j == 0:
+                    continue
+
+                curr_cost = 1 if grid[i][j] != 0 else 0
+                curr_score = grid[i][j] if grid[i][j] != 0 else 0
+
+                if i > 0:
+                    for c in range(curr_cost, k + 1):
+                        if dp[i-1][j][c - curr_cost] != -1:
+                            dp[i][j][c] = max(
+                                dp[i][j][c],
+                                dp[i-1][j][c - curr_cost] + curr_score
+                            )
+
+                if j > 0:
+                    for c in range(curr_cost, k + 1):
+                        if dp[i][j-1][c - curr_cost] != -1:
+                            dp[i][j][c] = max(
+                                dp[i][j][c],
+                                dp[i][j-1][c - curr_cost] + curr_score
+                            )
+
+        max_score = -1
+        for c in range(k + 1):
+            if dp[m-1][n-1][c] > max_score:
+                max_score = dp[m-1][n-1][c]
+        
+        return max_score
