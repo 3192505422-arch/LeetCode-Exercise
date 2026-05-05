@@ -1,0 +1,40 @@
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def rotateRight(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        # 边界情况：空链表、只有一个节点，或者不需要旋转
+        if not head or not head.next or k == 0:
+            return head
+        
+        # 第一步：计算链表长度，并找到尾节点
+        length = 1
+        tail = head
+        while tail.next:
+            tail = tail.next
+            length += 1
+        
+        # 第二步：取模，得到实际需要移动的次数
+        k = k % length
+        if k == 0:  # 如果k是长度的整数倍，不需要旋转
+            return head
+        
+        # 第三步：找到新的尾节点
+        # 新尾节点的位置是：从头节点走 (length - k - 1) 步
+        # 例如：length=5, k=2, 新尾节点需要走 5-2-1=2 步，从1走到3
+        new_tail = head
+        for _ in range(length - k - 1):
+            new_tail = new_tail.next
+        
+        # 第四步：新的头节点是新尾节点的下一个节点
+        new_head = new_tail.next
+        
+        # 第五步：将原尾节点连接到原头节点，形成环
+        tail.next = head
+        
+        # 第六步：断开新尾节点之后的连接
+        new_tail.next = None
+        
+        return new_head 
