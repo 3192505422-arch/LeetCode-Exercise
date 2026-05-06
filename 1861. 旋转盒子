@@ -1,0 +1,28 @@
+from typing import List
+
+class Solution:
+    def rotateTheBox(self, boxGrid: List[List[str]]) -> List[List[str]]:
+        m, n = len(boxGrid), len(boxGrid[0])
+        
+        # 第一步：在原矩阵每行模拟石头下落（从右向左）
+        for row in range(m):
+            # write_pos 指向当前可以放置石头的最后一格（从右往左）
+            write_pos = n - 1
+            # 从右向左扫描
+            for col in range(n - 1, -1, -1):
+                if boxGrid[row][col] == '*':
+                    # 遇到障碍物，重置 write_pos 到其左边一格
+                    write_pos = col - 1
+                elif boxGrid[row][col] == '#':
+                    # 石头下落：把 # 放到 write_pos 位置
+                    boxGrid[row][col] = '.'
+                    boxGrid[row][write_pos] = '#'
+                    write_pos -= 1
+        
+        # 第二步：顺时针旋转 90 度得到结果
+        rotated = [['.'] * m for _ in range(n)]
+        for i in range(m):
+            for j in range(n):
+                rotated[j][m - 1 - i] = boxGrid[i][j]
+        
+        return rotated
