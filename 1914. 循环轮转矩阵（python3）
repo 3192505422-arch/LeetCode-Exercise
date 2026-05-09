@@ -1,0 +1,65 @@
+from typing import List
+
+class Solution:
+    def rotateGrid(self, grid: List[List[int]], k: int) -> List[List[int]]:
+        m, n = len(grid), len(grid[0])
+        ans = [[0] * n for _ in range(m)]
+        
+        layers = min(m, n) // 2
+        
+        for layer in range(layers):
+            top, left = layer, layer
+            bottom, right = m - 1 - layer, n - 1 - layer
+            
+            # Step 1: 按逆时针顺序提取这一层的所有元素
+            elems = []
+            
+            # 上边 (top, left) -> (top, right)
+            for col in range(left, right + 1):
+                elems.append(grid[top][col])
+            
+            # 右边 (top+1, right) -> (bottom, right)
+            for row in range(top + 1, bottom + 1):
+                elems.append(grid[row][right])
+            
+            # 下边 (bottom, right-1) -> (bottom, left)
+            for col in range(right - 1, left - 1, -1):
+                elems.append(grid[bottom][col])
+            
+            # 左边 (bottom-1, left) -> (top+1, left)
+            for row in range(bottom - 1, top, -1):
+                elems.append(grid[row][left])
+            
+            total = len(elems)
+            if total == 0:
+                continue
+            
+            k_mod = k % total
+            
+            # Step 2: 旋转（循环左移 k_mod 次）
+            rotated = elems[k_mod:] + elems[:k_mod]
+            
+            # Step 3: 将旋转后的元素按原逆时针顺序写回 ans
+            idx = 0
+            
+            # 上边
+            for col in range(left, right + 1):
+                ans[top][col] = rotated[idx]
+                idx += 1
+            
+            # 右边
+            for row in range(top + 1, bottom + 1):
+                ans[row][right] = rotated[idx]
+                idx += 1
+            
+            # 下边
+            for col in range(right - 1, left - 1, -1):
+                ans[bottom][col] = rotated[idx]
+                idx += 1
+            
+            # 左边
+            for row in range(bottom - 1, top, -1):
+                ans[row][left] = rotated[idx]
+                idx += 1
+        
+        return ans   
