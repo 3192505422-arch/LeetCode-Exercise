@@ -1,0 +1,32 @@
+from typing import List
+from collections import deque
+
+class Solution:
+    def canReach(self, arr: List[int], start: int) -> bool:
+        n = len(arr)
+        visited = [False] * n
+        queue = deque([start])
+        
+        while queue:
+            i = queue.popleft()
+            
+            # 到达值为0的位置
+            if arr[i] == 0:
+                return True
+            
+            # 标记已访问
+            if visited[i]:
+                continue
+            visited[i] = True
+            
+            # 两种跳法
+            next_pos1 = i + arr[i]
+            next_pos2 = i - arr[i]
+            
+            if 0 <= next_pos1 < n and not visited[next_pos1]:
+                queue.append(next_pos1)
+            
+            if 0 <= next_pos2 < n and not visited[next_pos2]:
+                queue.append(next_pos2)
+        
+        return False
