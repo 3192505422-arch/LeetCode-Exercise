@@ -1,0 +1,35 @@
+from typing import List
+from collections import defaultdict, deque
+
+class Solution:
+    def minJumps(self, arr: List[int]) -> int:
+        n = len(arr)
+        if n == 1:
+            return 0
+
+        pos = defaultdict(list)
+        for i, val in enumerate(arr):
+            pos[val].append(i)
+        
+        visited = [False] * n
+        visited[0] = True
+        q = deque([(0, 0)]) 
+        
+        while q:
+            i, steps = q.popleft()
+            if i == n - 1:
+                return steps
+
+            for ni in (i - 1, i + 1):
+                if 0 <= ni < n and not visited[ni]:
+                    visited[ni] = True
+                    q.append((ni, steps + 1))
+
+            if arr[i] in pos:
+                for ni in pos[arr[i]]:
+                    if not visited[ni]:
+                        visited[ni] = True
+                        q.append((ni, steps + 1))
+                del pos[arr[i]]
+        
+        return -1  
