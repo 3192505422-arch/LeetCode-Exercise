@@ -1,0 +1,67 @@
+from typing import List
+
+class TrieNode:
+    __slots__ = ('children', 'best_idx', 'best_len', 'depth')
+    def __init__(self, depth: int = 0):
+        self.children = [None] * 26
+        self.best_idx = -1      # 经过此节点的最优字符串在 wordsContainer 中的下标
+        self.best_len = 10**9   # 最优字符串的长度
+        self.depth = depth      # 深度，表示公共后缀的长度
+
+class Solution:
+    def stringIndices(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:
+        root = TrieNode()
+        
+        # 插入所有 container 字符串
+        for idx, word in enumerate(wordsContainer):
+            cur = root
+            n = len(word)
+            # 反转：从尾往前插入
+            for i in range(n - 1, -1, -1):
+                c = ord(word[i]) - ord('a')
+                if not cur.children[c]:
+                    cur.children[c] = TrieNode(cur.depth + 1)
+                cur = cur.children[c]
+                
+                # 更新当前节点的最优信息
+                # 比较规则：深度（公共后缀长度）> 字符串长度（短优先）> 原下标（小优先）
+                if (cur.best_idx == -1 or
+                    cur.depth > root.children[0].depth  # 这里错了，应该是比较当前存储的最优的深度
+                    # 我们要用一个更简洁的方式：
+                ):
+                    pass
+
+        root = TrieNode()
+        # 插入
+        for idx, word in enumerate(wordsContainer):
+            cur = root
+            n = len(word)
+            # 空字符串也算公共后缀
+            # 先更新 root 节点：候选是当前插入的字符串，比较时按原长度优先，原下标优先
+            if root.best_idx == -1 or n < root.best_len or (n == root.best_len and idx < root.best_idx):
+                root.best_idx = idx
+                root.best_len = n
+            
+            for i in range(n - 1, -1, -1):
+                c = ord(word[i]) - ord('a')
+                if not cur.children[c]:
+                    cur.children[c] = TrieNode(cur.depth + 1)
+                cur = cur.children[c]
+                # 更新该节点的最优候选
+                if cur.best_idx == -1 or n < cur.best_len or (n == cur.best_len and idx < cur.best_idx):
+                    cur.best_idx = idx
+                    cur.best_len = n
+        
+        # 查询
+        ans = []
+        for q in wordsQuery:
+            cur = root
+            # 反转后匹配
+            for i in range(len(q) - 1, -1, -1):
+                c = ord(q[i]) - ord('a')
+                if not cur.children[c]:
+                    break
+                cur = cur.children[c]
+            ans.append(cur.best_idx)
+        
+        return ans 
