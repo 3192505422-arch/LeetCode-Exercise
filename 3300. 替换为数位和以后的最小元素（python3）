@@ -1,0 +1,13 @@
+from typing import List
+
+class Solution:
+    def digitSum(self, num: int) -> int:
+        total = 0
+        while num > 0:
+            total += num % 10
+            num //= 10
+        return total
+
+    def minElement(self, nums: List[int]) -> int:
+        transformed = [self.digitSum(x) for x in nums]
+        return min(transformed)
