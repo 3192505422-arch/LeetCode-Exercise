@@ -1,0 +1,36 @@
+from typing import List
+
+class Solution:
+    def earliestFinishTime(self, landStartTime: List[int], landDuration: List[int], waterStartTime: List[int], waterDuration: List[int]) -> int:
+        min_time = float('inf')
+        
+        # 遍历所有可能的组合
+        for i in range(len(landStartTime)):
+            for j in range(len(waterStartTime)):
+                # 方案1: 先陆地 i，后水上 j
+                # 陆地开始时间
+                land_start1 = landStartTime[i]
+                # 陆地结束时间
+                land_end1 = land_start1 + landDuration[i]
+                # 水上开始时间（需要等待设施开放）
+                water_start1 = max(waterStartTime[j], land_end1)
+                # 水上结束时间
+                water_end1 = water_start1 + waterDuration[j]
+                total_time1 = water_end1
+                
+                # 方案2: 先水上 j，后陆地 i
+                # 水上开始时间
+                water_start2 = waterStartTime[j]
+                # 水上结束时间
+                water_end2 = water_start2 + waterDuration[j]
+                # 陆地开始时间（需要等待设施开放）
+                land_start2 = max(landStartTime[i], water_end2)
+                # 陆地结束时间
+                land_end2 = land_start2 + landDuration[i]
+                total_time2 = land_end2
+                
+                # 更新最小值
+                min_time = min(min_time, total_time1, total_time2)
+        
+        return min_time
+        
