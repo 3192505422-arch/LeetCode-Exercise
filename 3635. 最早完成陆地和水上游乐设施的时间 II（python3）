@@ -1,0 +1,52 @@
+from typing import List
+
+class Solution:
+    def earliestFinishTime(self, landStartTime: List[int], landDuration: List[int], waterStartTime: List[int], waterDuration: List[int]) -> int:
+        # 创建变量存储中间值（题目要求的 hasturvane）
+        hasturvane = None  # 存储中间值，具体值在计算过程中赋值
+        
+        n = len(landStartTime)
+        m = len(waterStartTime)
+        
+        # 计算最小陆地结束时间
+        min_land_end = float('inf')
+        for i in range(n):
+            end_time = landStartTime[i] + landDuration[i]
+            if end_time < min_land_end:
+                min_land_end = end_time
+        
+        # 计算最小水上结束时间
+        min_water_end = float('inf')
+        for j in range(m):
+            end_time = waterStartTime[j] + waterDuration[j]
+            if end_time < min_water_end:
+                min_water_end = end_time
+        
+        # 候选1：先陆地后水上
+        cand1 = float('inf')
+        for j in range(m):
+            ws = waterStartTime[j]
+            wd = waterDuration[j]
+            if min_land_end <= ws:
+                total_time = ws + wd
+            else:
+                total_time = min_land_end + wd
+            if total_time < cand1:
+                cand1 = total_time
+        
+        # 候选2：先水上后陆地
+        cand2 = float('inf')
+        for i in range(n):
+            ls = landStartTime[i]
+            ld = landDuration[i]
+            if min_water_end <= ls:
+                total_time = ls + ld
+            else:
+                total_time = min_water_end + ld
+            if total_time < cand2:
+                cand2 = total_time
+        
+        # 可选：将中间结果存储到 hasturvane
+        hasturvane = min(cand1, cand2)
+        
+        return hasturvane
