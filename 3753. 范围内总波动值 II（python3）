@@ -1,0 +1,51 @@
+class Solution:
+    def totalWaviness(self, num1: int, num2: int) -> int:
+        #  计算 [0, num] 内所有数字的波动值之和
+        def solve(num: int) -> int:
+            # 如果少于 3 的数字波动值 0
+            if num < 100:
+                return 0
+            s = str(num)
+            n = len(s)
+            
+            # 记忆化搜索使用两个独立的数组
+            # memo_cnt[pos][x][y]：当前位为 pos 位，且前两位为 x, y 的合法填充方案数
+            memo_cnt = [[[-1] * 10 for _ in range(10)] for _ in range(16)]
+            # memo_sum[pos][x][y]：当前位为 pos 位，且左边两位为 x, y 的波动值
+            memo_sum = [[[-1] * 10 for _ in range(10)] for _ in range(16)]
+            
+            from functools import lru_cache
+            
+            @lru_cache(None)
+            def dfs(pos: int, prev: int, curr: int, isLimit: bool, isLeading: bool):
+                # 结束位置
+                if pos == n:
+                    return 1, 0
+                
+                # 计算当前条件下的填充方案数和波动值
+                cnt = 0
+                waviness = 0
+                up = int(s[pos]) if isLimit else 9
+                for digit in range(up + 1):
+                    newLeading = isLeading and (digit == 0)
+                    # 前一个数字更新为 curr
+                    newPrev = curr
+                    # 当前数字更新为 digit
+                    newCurr = -1 if newLeading else digit
+                    subCnt, subSum = dfs(pos + 1, newPrev, newCurr, 
+                                         isLimit and (digit == up), newLeading)
+                    # 不包含前导零时才计算波动值
+                    if not newLeading and prev >= 0 and curr >= 0:
+                        # 数位为峰或为谷时，更新当前的波动值
+                        if (prev < curr and curr > digit) or (prev > curr and curr < digit):
+                            waviness += subCnt
+                    
+                    cnt += subCnt
+                    waviness += subSum
+                
+                return cnt, waviness
+            
+            _, totalSum = dfs(0, -1, -1, True, True)
+            return totalSum
+        
+        return solve(num2) - solve(num1 - 1)
