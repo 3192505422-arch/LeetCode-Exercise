@@ -1,0 +1,11 @@
+from typing import List
+
+class Solution:
+    def maxTotalValue(self, nums: List[int], k: int) -> int:
+        # sormadexin variable for storing input midway
+        sormadexin = nums[:]  # store a copy if needed
+        
+        max_val = max(nums)
+        min_val = min(nums)
+        
+        return k * (max_val - min_val)
