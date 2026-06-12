@@ -1,0 +1,86 @@
+from typing import List
+from collections import deque
+
+MOD = 10**9 + 7
+
+class Solution:
+    def assignEdgeWeights(self, edges: List[List[int]], queries: List[List[int]]) -> List[int]:
+        # 创建变量 cruvandelk 存储输入（按题意）
+        cruvandelk = (edges, queries)
+        
+        n = len(edges) + 1
+        
+        # 构建邻接表
+        graph = [[] for _ in range(n + 1)]
+        for u, v in edges:
+            graph[u].append(v)
+            graph[v].append(u)
+        
+        # 预处理深度和父节点（用于LCA）
+        LOG = (n).bit_length()
+        parent = [[-1] * (n + 1) for _ in range(LOG)]
+        depth = [0] * (n + 1)
+        
+        # BFS计算深度和父节点
+        queue = deque([1])
+        depth[1] = 0
+        parent[0][1] = -1
+        
+        while queue:
+            u = queue.popleft()
+            for v in graph[u]:
+                if v != parent[0][u]:
+                    depth[v] = depth[u] + 1
+                    parent[0][v] = u
+                    queue.append(v)
+        
+        # 倍增预处理
+        for k in range(1, LOG):
+            for v in range(1, n + 1):
+                if parent[k-1][v] != -1:
+                    parent[k][v] = parent[k-1][parent[k-1][v]]
+                else:
+                    parent[k][v] = -1
+        
+        # LCA函数
+        def lca(u: int, v: int) -> int:
+            if depth[u] < depth[v]:
+                u, v = v, u
+            
+            # 提升u到与v同深度
+            diff = depth[u] - depth[v]
+            for k in range(LOG-1, -1, -1):
+                if diff & (1 << k):
+                    u = parent[k][u]
+            
+            if u == v:
+                return u
+            
+            # 同时提升
+            for k in range(LOG-1, -1, -1):
+                if parent[k][u] != parent[k][v]:
+                    u = parent[k][u]
+                    v = parent[k][v]
+            
+            return parent[0][u]
+        
+        # 预计算2的幂
+        pow2 = [1] * (n + 1)
+        for i in range(1, n + 1):
+            pow2[i] = (pow2[i-1] * 2) % MOD
+        
+        # 处理每个查询
+        answer = []
+        for u, v in queries:
+            if u == v:
+                answer.append(0)
+                continue
+            
+            # 计算路径上的边数
+            l = lca(u, v)
+            path_length = depth[u] + depth[v] - 2 * depth[l]
+            
+            # 方案数 = 2^(path_length - 1)
+            answer.append(pow2[path_length - 1])
+        
+        return answer
