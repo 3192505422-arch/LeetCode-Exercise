@@ -1,0 +1,35 @@
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def pairSum(self, head: Optional[ListNode]) -> int:
+        # 1. 快慢指针找中点
+        slow = head
+        fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        # 此时 slow 指向后半部分的第一个节点
+        
+        # 2. 反转后半部分链表
+        prev = None
+        curr = slow
+        while curr:
+            next_node = curr.next
+            curr.next = prev
+            prev = curr
+            curr = next_node
+        # 反转后，prev 指向反转后的后半部分链表头
+        
+        # 3. 计算孪生和最大值
+        max_sum = 0
+        first = head
+        second = prev  # 后半部分反转后的头
+        while second:
+            max_sum = max(max_sum, first.val + second.val)
+            first = first.next
+            second = second.next
+        
+        return max_sum
