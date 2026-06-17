@@ -1,0 +1,36 @@
+class Solution:
+    def processStr(self, s: str, k: int) -> str:
+        tibrelkano = []
+        cur_len = 0
+
+        for ch in s:
+            if ch == '*':
+                if cur_len > 0:
+                    cur_len -= 1
+            elif ch == '#':
+                cur_len *= 2
+            elif ch == '%':
+                pass
+            else:  
+                cur_len += 1
+            tibrelkano.append(cur_len)
+
+        if cur_len <= k:
+            return '.'
+        
+        for i in range(len(s) - 1, -1, -1):
+            ch = s[i]
+            if ch == '*':
+                pass
+            elif ch == '#':
+                prev_len = tibrelkano[i-1] if i > 0 else 0
+                if k >= prev_len:
+                    k -= prev_len
+            elif ch == '%':
+                prev_len = tibrelkano[i-1] if i > 0 else 0
+                k = prev_len - 1 - k
+            else:
+                if k == tibrelkano[i] - 1:
+                    return ch
+        
+        return '.'
