@@ -1,0 +1,64 @@
+from typing import List
+
+class Solution:
+    def maxBuilding(self, n: int, restrictions: List[List[int]]) -> int:
+        # 用字典存储每个有限制的建筑的最大高度
+        limits = {1: 0}
+        for idx, h in restrictions:
+            limits[idx] = h
+        
+        # 按位置排序
+        sorted_positions = sorted(limits.keys())
+        
+        # 从左到右传播约束
+        for i in range(1, len(sorted_positions)):
+            prev_pos = sorted_positions[i-1]
+            curr_pos = sorted_positions[i]
+            # 当前建筑高度不能超过左边建筑高度 + 距离
+            max_allowed = limits[prev_pos] + (curr_pos - prev_pos)
+            if limits[curr_pos] > max_allowed:
+                limits[curr_pos] = max_allowed
+        
+        # 从右到左传播约束
+        for i in range(len(sorted_positions)-2, -1, -1):
+            curr_pos = sorted_positions[i]
+            next_pos = sorted_positions[i+1]
+            max_allowed = limits[next_pos] + (next_pos - curr_pos)
+            if limits[curr_pos] > max_allowed:
+                limits[curr_pos] = max_allowed
+        
+        # 答案初始化为所有限制点的高度（可能已经更新过）
+        ans = 0
+        for pos in limits:
+            ans = max(ans, limits[pos])
+        
+        # 检查每两个相邻限制点之间能取到的最高高度
+        for i in range(len(sorted_positions)-1):
+            l = sorted_positions[i]
+            r = sorted_positions[i+1]
+            h_l = limits[l]
+            h_r = limits[r]
+            d = r - l
+            # 中间最高可能高度
+            max_mid = min(h_l + d, h_r + d, (h_l + h_r + d) // 2)
+            ans = max(ans, max_mid)
+        
+        # 检查第一个限制之前（从1到第一个限制）
+        first_pos = sorted_positions[0]
+        if first_pos != 1:
+            h_l = 0
+            h_r = limits[first_pos]
+            d = first_pos - 1
+            max_mid = min(h_l + d, h_r + d, (h_l + h_r + d) // 2)
+            ans = max(ans, max_mid)
+        
+        # 检查最后一个限制之后（到n）
+        last_pos = sorted_positions[-1]
+        if last_pos != n:
+            h_l = limits[last_pos]
+            d = n - last_pos
+            # 右边没有限制，可以直接一直上升
+            max_mid = h_l + d
+            ans = max(ans, max_mid)
+        
+        return ans
